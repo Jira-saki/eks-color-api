@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Color Classifier Demo</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 28px; }
+    .card { border: 1px solid #ddd; border-radius: 14px; padding: 18px; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    input { padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc; width: 200px; }
+    button { padding: 10px 14px; border-radius: 10px; border: 1px solid #ccc; cursor: pointer; }
+    .pill { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #f3f3f3; }
+    pre { background: #f8f8f8; padding: 12px; border-radius: 10px; overflow: auto; }
+    .swatch { width: 42px; height: 42px; border-radius: 10px; border: 1px solid rgba(0,0,0,.15); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h2>Color Classifier (FastAPI)</h2>
+    <div class="card">
+      <div class="row">
+        <div class="swatch" id="swatch"></div>
+        <input id="hex" placeholder="#ff3366" value="#ff3366" />
+        <button id="btn">Predict</button>
+        <span class="pill" id="result">—</span>
+      </div>
+      <p style="margin-top:14px;color:#555">
+        Backend: <code>POST /predict</code> returns <code>color_name</code> + <code>group</code>.
+      </p>
+      <pre id="raw">{}</pre>
+    </div>
+  </div>
+
+<script>
+const apiBase = "http://localhost:8000"; // later on EKS: set to your ALB URL
+const hexInput = document.getElementById("hex");
+const btn = document.getElementById("btn");
+const result = document.getElementById("result");
+const raw = document.getElementById("raw");
+const swatch = document.getElementById("swatch");
+
+function setColor(hex) {
+  swatch.style.background = hex;
+  document.body.style.background = hex;
+}
+
+btn.addEventListener("click", async () => {
+  const hex = hexInput.value.trim();
+  result.textContent = "Loading...";
+  raw.textContent = "{}";
+  try {
+    const res = await fetch(`${apiBase}/predict`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({hex})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Request failed");
+    result.textContent = `${data.color_name} (${data.group})`;
+    raw.textContent = JSON.stringify(data, null, 2);
+    setColor(data.hex);
+  } catch (e) {
+    result.textContent = `Error: ${e.message}`;
+  }
+});
+setColor(hexInput.value);
+</script>
+</body>
+</html>
