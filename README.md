@@ -10,32 +10,8 @@ Developed to bridge the gap between CKA/CKS concepts and production-ready AWS en
 
 Designed with a clear separation between **Network** and **Compute** layers for maximum isolation.
 
-```mermaid
-flowchart TD
-  subgraph Public_Subnet
-    ALB([AWS ALB])
-    NAT[NAT Gateway]
-  end
+<img src="./images/EKS-immutable.png" alt="Architecture Diagram" width="600">
 
-  subgraph Private_Subnet
-    EKS_Nodes[EKS Managed Nodes<br/>Bottlerocket OS]
-    Pod([FastAPI Pod])
-  end
-
-  Client([Client]) --> ALB
-  ALB --> Ingress([K8s Ingress])
-  Ingress --> Service([K8s Service])
-  Service --> Pod
-  
-  EKS_Nodes --> NAT --> IGW([Internet Gateway])
-  
-  subgraph Security_Layer
-    KMS[AWS KMS<br/>Secrets Encryption]
-    OIDC[OIDC Provider<br/>IRSA Enabled]
-  end
-
-  Dev([Developer]) -- "Terraform Plan/Apply" --> Infra(["AWS Infra<br/>(VPC/EKS/IAM)"])
-```
 
 ---
 
