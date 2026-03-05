@@ -10,7 +10,7 @@ Developed to bridge the gap between CKA/CKS concepts and production-ready AWS en
 
 Designed with a clear separation between **Network** and **Compute** layers for maximum isolation.
 
-<img src="./images/eks_immutable_infrastructure.png" alt="Architecture Diagram" width="600">
+<img src="./images/eks_immutable_infrastructure.png" alt="Architecture Diagram" width="800">
 
 
 ---
